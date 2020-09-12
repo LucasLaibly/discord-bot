@@ -29,10 +29,26 @@ bot.on('message', async message => {
                     .setColor('GREEN');
     
         let msgEmbed = await message.channel.send(embed);
-        msgEmbed.react('😇');
+        msgEmbed.react('🎥');
+        msgEmbed.react('🐙');
+        msgEmbed.react('🦑');
     }
 })
 
+bot.on('messageReactionAdd', async (reaction, user) => {
+    if (reaction.message.partial) await reaction.message.fetch();
+    if (reaction.partial) await reaction.fetch();
 
+    if (user.bot) return;
+
+    if (reaction.message.channel.id === "753769059945807886") {
+        // we are making it into the correct channel
+        if (reaction.emoji.id === '754172422692798565') {
+            //console.log('inside');
+            await reaction.message.guild.members.cache.get(user.id).roles.add("754170556131049493");
+        }
+    }
+
+})
 
 bot.login(token);
