@@ -43,7 +43,7 @@ bot.on('messageReactionAdd', async (reaction, user) => {
 
     if (reaction.message.channel.id === "753769059945807886") {
         // we are making it into the correct channel
-        if (reaction.emoji.id === '754172422692798565') {
+        if (reaction.emoji.name === '🎥') {
             //console.log('inside');
             await reaction.message.guild.members.cache.get(user.id).roles.add("754170556131049493");
         }
