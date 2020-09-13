@@ -6,12 +6,17 @@ const bot = new Discord.Client( {partials: ['MESSAGE', "CHANNEL", "REACTION"]} )
 const token = process.env.Discord_Token;
 const prefix = '!';
 
+var ticketNumber = 0;
+
 bot.on('ready', () => {
     console.log('Time For Movie Night.');
 
     bot.user.setActivity('Movie Night Bot!').catch(console.error);
 });
 
+/**
+ * Post message that triggers emoji reactions 
+ */
 bot.on('message', async message => {
 
     if (message.author.bot || message.channel.type === "dm") return;
@@ -31,21 +36,54 @@ bot.on('message', async message => {
         let msgEmbed = await message.channel.send(embed);
         msgEmbed.react('🎥');
         msgEmbed.react('🐙');
-        msgEmbed.react('🦑');
+        msgEmbed.react('📫');
     }
 })
 
+/**
+ * Handle user reaction to bot message
+ */
 bot.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.message.partial) await reaction.message.fetch();
     if (reaction.partial) await reaction.fetch();
 
     if (user.bot) return;
 
-    if (reaction.message.channel.id === "753769059945807886") {
+    if (reaction.message.channel.id === process.env.DISCORD_CHANNEL_ID) {
         // we are making it into the correct channel
         if (reaction.emoji.name === '🎥') {
             //console.log('inside');
-            await reaction.message.guild.members.cache.get(user.id).roles.add("754170556131049493");
+            await reaction.message.guild.members.cache.get(user.id).roles.add(process.env.DISCORD_ROLE_ID);
+        }
+
+        // if user responds to ticket, create ticket
+        else if (reaction.emoji.name === '📫') {
+            ticketNumber++;
+
+            await reaction.message.guild.members.cache.get(user.id).send("Your ticket number is: " + ticketNumber);
+            
+            const embed = new Discord.MessageEmbed()
+                    .setTitle('Ticket Number: ' + ticketNumber)
+                    .setDescription('User ' + user.username)
+                    .setColor('RED');
+    
+            await reaction.message.guild.members.cache.get(process.env.DISCORD_BOT_OWNER).send(embed);
+        }
+    }
+})
+
+/**
+ * Handle user if they remove their reaction to bot message
+ */
+bot.on('messageReactionRemove', async (reaction, user) => {
+    if (reaction.message.partial) await reaction.message.fetch();
+    if (reaction.partial) await reaction.fetch();
+
+    if (user.bot) return;
+
+    if (reaction.message.channel.id === process.env.DISCORD_CHANNEL_ID) {
+        if (reaction.emoji.name === '🎥') {
+            await reaction.message.guild.members.cache.get(user.id).roles.remove(process.env.DISCORD_ROLE_ID);
         }
     }
 
