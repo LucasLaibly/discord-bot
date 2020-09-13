@@ -14,6 +14,9 @@ bot.on('ready', () => {
     bot.user.setActivity('Movie Night Bot!').catch(console.error);
 });
 
+/**
+ * Post message that triggers emoji reactions 
+ */
 bot.on('message', async message => {
 
     if (message.author.bot || message.channel.type === "dm") return;
@@ -37,6 +40,9 @@ bot.on('message', async message => {
     }
 })
 
+/**
+ * Handle user reaction to bot message
+ */
 bot.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.message.partial) await reaction.message.fetch();
     if (reaction.partial) await reaction.fetch();
@@ -50,6 +56,7 @@ bot.on('messageReactionAdd', async (reaction, user) => {
             await reaction.message.guild.members.cache.get(user.id).roles.add(process.env.DISCORD_ROLE_ID);
         }
 
+        // if user responds to ticket, create ticket
         else if (reaction.emoji.name === '📫') {
             ticketNumber++;
 
@@ -65,6 +72,9 @@ bot.on('messageReactionAdd', async (reaction, user) => {
     }
 })
 
+/**
+ * Handle user if they remove their reaction to bot message
+ */
 bot.on('messageReactionRemove', async (reaction, user) => {
     if (reaction.message.partial) await reaction.message.fetch();
     if (reaction.partial) await reaction.fetch();
